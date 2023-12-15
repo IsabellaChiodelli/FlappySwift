@@ -3,7 +3,7 @@
 #define TUBE_WIDTH 80
 #define TUBE_HEIGHT 800
 #define N_BARRA 10
-#define DIST_X_TUBES 260
+#define DIST_X_TUBES 300
 
 typedef enum GameScreen { MENU, START, GAME, PAUSE, OVER, RANK, DIFF } GameScreen;
 
@@ -31,14 +31,14 @@ typedef struct Tubes {
 
 } Tubes;
 
-static int dist_alt =  40;
+static int dist_alt =  250;
 
 int cabe_tela(int pos_in, int gap){
     int diff;
     int pos_out;
     diff = GetRandomValue(-dist_alt, dist_alt);
     pos_out = pos_in + diff;
-    if (pos_out > - 50 - gap){
+    if (pos_out > -50 - gap){
         cabe_tela(pos_in, gap);
     }else{
         if(pos_out < -750){
@@ -63,6 +63,29 @@ int main(void){
 
     const int screenWidth = 1200;
     const int screenHeight = 800;
+    InitWindow(screenWidth, screenHeight, "Teste Joguinho");
+
+    Texture2D Name_Game = LoadTexture("resources/nome_jogo.png");
+    Texture2D PlayTx = LoadTexture("resources/Play.png");
+    Texture2D RankTx = LoadTexture("resources/Rank.png");
+    Texture2D DiffTx = LoadTexture("resources/Difficulty.png");
+    Texture2D ExitTx = LoadTexture("resources/Exit.png");
+    Texture2D Diff1Tx = LoadTexture("resources/Diff_1.png");
+    Texture2D Diff2Tx = LoadTexture("resources/Diff_2.png");
+    Texture2D Diff3Tx = LoadTexture("resources/Diff_3.png");
+    Texture2D Diff4Tx = LoadTexture("resources/Diff_4.png");
+    Texture2D Diff5Tx = LoadTexture("resources/Diff_5.png");
+    Texture2D RestartEGTx = LoadTexture("resources/Restart_EG.png");
+    Texture2D MenuEGTx = LoadTexture("resources/Menu_EG.png");
+    Texture2D VoltarTx = LoadTexture("resources/Voltar.png");
+    Texture2D FundoTx = LoadTexture("resources/Fundo.png");
+    Texture2D GameOverTx = LoadTexture("resources/Game_Over.png");
+    Texture2D DiffTitleTx = LoadTexture("resources/Diff_titles.png");
+    Texture2D RankTitleTx = LoadTexture("resources/Rank_Title.png");
+    Texture2D TaylorTx = LoadTexture("resources/Taylor.png");
+    Texture2D UpBarTx = LoadTexture("resources/Up_Bar.png");
+    Texture2D DownBarTx = LoadTexture("resources/Down_Bar.png");
+    Texture2D Base_Rank = LoadTexture("resources/Base_Ranks.png");
 
     Player player;
     Tubes tubes[N_BARRA] = {0};
@@ -70,15 +93,14 @@ int main(void){
     int score = 0;
     int aug_vel = 0;
     char string_score[8] = {'0'};
+    int grav = 15;
 
 
 
-    InitWindow(screenWidth, screenHeight, "Teste Joguinho");
 
     GameScreen currentScreen = MENU;
 
     Rectangle backMenu = { 0, 0, screenWidth, screenHeight };
-    Rectangle gameName = { screenWidth/2 - 400, 50, 800, 200 };
     Rectangle playBtn = { screenWidth/2 - 150, screenHeight/2 - 110, 300, 100 };
     Rectangle diffBtn = { screenWidth/2 - 150, screenHeight/2, 300, 100 };
     Rectangle rankBtn = { screenWidth/2 - 150, screenHeight/2 + 110, 300, 100 };
@@ -101,7 +123,7 @@ int main(void){
 
     Vector2 mousePoint = { 0.0f, 0.0f };
 
-    player.rec = (Rectangle){ 200, 200, 40, 80 };
+    player.rec = (Rectangle){ 200, 200, 80, 80 };
     player.cor = RED;
     tubeSpeed = 5;
 
@@ -118,7 +140,7 @@ int main(void){
             {
                 player.rec.y = 200;
                 tubes[0].gap = 300;
-                tubes[0].tubeUp.rec = (Rectangle){ 1160, GetRandomValue(-dist_alt, dist_alt) - tubes[0].gap/2 - 400, TUBE_WIDTH, TUBE_HEIGHT};
+                tubes[0].tubeUp.rec = (Rectangle){ 1160, cabe_tela(-400 - tubes[0].gap/2, tubes[0].gap), TUBE_WIDTH, TUBE_HEIGHT};
                 tubes[0].tubeUp.cor = RED;
                 tubes[0].tubeDown.rec = (Rectangle){1160, tubes[0].tubeUp.rec.y + tubes[0].gap + TUBE_HEIGHT , TUBE_WIDTH, TUBE_HEIGHT };
                 tubes[0].tubeDown.cor = RED;
@@ -173,10 +195,39 @@ int main(void){
             }break;
             case GAME:
             {
-                if(!(IsKeyDown(KEY_SPACE) && player.rec.y == 0)) player.rec.y += 5;
-                if (IsKeyDown(KEY_SPACE) && player.rec.y > 0) {
-                        player.rec.y -= 10;
+                if (IsKeyPressed(KEY_SPACE) && player.rec.y > 0) {
+                       grav = 50;
                 }
+                if(grav>0){
+                    if(grav > 40){
+                        grav--;
+                        player.rec.y -= 9;
+                    }else{
+                        if(grav > 35){
+                            grav--;
+                            player.rec.y -= 4;
+                        }else{
+                            if(grav > 30){
+                                grav--;
+                            }else{
+                                if(grav > 23){
+                                     player.rec.y += 3;
+                                     grav--;
+                                }else{
+                                    grav--;
+                                    player.rec.y += 7;
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }else{
+                    player.rec.y += 10;
+                }
+
                 for(int i=0;i<N_BARRA;i++){
 
                     tubes[i].tubeUp.rec.x -= tubeSpeed ;
@@ -197,6 +248,7 @@ int main(void){
                     }
                     if(CheckCollisionRecs(player.rec, tubes[i].tubeUp.rec) || CheckCollisionRecs(player.rec, tubes[i].tubeDown.rec)){
                         currentScreen = OVER;
+                        break;
                     }
                     if (player.rec.x > tubes[i].tubeUp.rec.x +20 && tubes[i].valid == true){
                         score++;
@@ -210,10 +262,12 @@ int main(void){
                         aug_vel = 0;
 
                     }
-                    if (player.rec.y > 764){
-                        if(player.rec.y > 764) player.rec.y = 760;
+                    if (player.rec.y > 724){
+                        if(player.rec.y > 724) player.rec.y = 720;
                         currentScreen = OVER;
                     }
+                    if (player.rec.y < 0)player.rec.y = 0;
+
 
 
 
@@ -224,17 +278,17 @@ int main(void){
                     if (IsKeyDown(KEY_SPACE)){
                         player.rec.y = 200;
                         tubes[0].gap = 300;
-                        tubes[0].tubeUp.rec = (Rectangle){ 1160, -400 + GetRandomValue(-dist_alt, dist_alt) - tubes[0].gap/2, TUBE_WIDTH, TUBE_HEIGHT};
+                        tubes[0].tubeUp.rec = (Rectangle){ 1160, cabe_tela(-400 - tubes[0].gap/2, tubes[0].gap), TUBE_WIDTH, TUBE_HEIGHT};
                         tubes[0].tubeUp.cor = RED;
-                        tubes[0].tubeDown.rec = (Rectangle){1160, tubes[0].tubeUp.rec.y + tubes[0].gap , TUBE_WIDTH, TUBE_HEIGHT };
+                        tubes[0].tubeDown.rec = (Rectangle){1160, tubes[0].tubeUp.rec.y + tubes[0].gap + TUBE_HEIGHT , TUBE_WIDTH, TUBE_HEIGHT };
                         tubes[0].tubeDown.cor = RED;
                         tubes[0].valid = true;
                         tubes[0].respawn = true;
                 for(int i=1;i<N_BARRA;i++){
                     tubes[i].gap = 300;
-                    tubes[i].tubeUp.rec = (Rectangle){ 1160 + i*300, cabe_tela(tubes[retorno(i)].tubeUp.rec.y, tubes[i].gap), TUBE_WIDTH , TUBE_HEIGHT };
+                    tubes[i].tubeUp.rec = (Rectangle){ 1160 + i*(DIST_X_TUBES + TUBE_WIDTH), cabe_tela(tubes[retorno(i)].tubeUp.rec.y, tubes[i].gap), TUBE_WIDTH , TUBE_HEIGHT };
                     tubes[i].tubeUp.cor = RED;
-                    tubes[i].tubeDown.rec = (Rectangle){1160 + i*300, tubes[i].tubeUp.rec.y + tubes[i].gap + TUBE_HEIGHT,  TUBE_WIDTH, TUBE_HEIGHT };
+                    tubes[i].tubeDown.rec = (Rectangle){1160 + i*(DIST_X_TUBES + TUBE_WIDTH), tubes[i].tubeUp.rec.y + tubes[i].gap + TUBE_HEIGHT,  TUBE_WIDTH, TUBE_HEIGHT };
                     tubes[i].tubeDown.cor = RED;
                     tubes[i].valid = true;
                     tubes[i].respawn = true;
@@ -281,23 +335,25 @@ int main(void){
             case MENU:
             {
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
-                DrawRectangleRec(gameName, RED);
-                DrawRectangleRec(playBtn, RED);
-                DrawRectangleRec(diffBtn, RED);
-                DrawRectangleRec(rankBtn, RED);
-                DrawRectangleRec(exitBtn, RED);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
+                DrawTextureRec(Name_Game, (Rectangle){0,0,800,200}, (Vector2){screenWidth/2 - 400, 50}, RAYWHITE);
+                DrawTextureRec(PlayTx, (Rectangle){0,0,playBtn.width,playBtn.height}, (Vector2){playBtn.x, playBtn.y}, RAYWHITE);
+                DrawTextureRec(DiffTx, (Rectangle){0,0,diffBtn.width,diffBtn.height}, (Vector2){diffBtn.x, diffBtn.y}, RAYWHITE);
+                DrawTextureRec(RankTx, (Rectangle){0,0,rankBtn.width,rankBtn.height}, (Vector2){rankBtn.x, rankBtn.y}, RAYWHITE);
+                DrawTextureRec(ExitTx, (Rectangle){0,0,exitBtn.width,exitBtn.height}, (Vector2){exitBtn.x, exitBtn.y}, RAYWHITE);
+
 
             } break;
 
             case START:{
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
-                DrawRectangleRec(player.rec, player.cor);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
+                DrawTextureRec(TaylorTx, (Rectangle){0,0,player.rec.width,player.rec.height}, (Vector2){player.rec.x, player.rec.y}, RAYWHITE);
                 int i =0;
                 while(i<N_BARRA){
-                    DrawRectangle(tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y, tubes[i].tubeUp.rec.width, tubes[i].tubeUp.rec.height, tubes[i].tubeUp.cor);
-                    DrawRectangle(tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y, tubes[i].tubeDown.rec.width, tubes[i].tubeDown.rec.height, tubes[i].tubeDown.cor);
+                    DrawTextureRec(UpBarTx, (Rectangle){0,0,tubes[i].tubeUp.rec.width,tubes[i].tubeUp.rec.height}, (Vector2){tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y}, RAYWHITE);
+
+                    DrawTextureRec(DownBarTx, (Rectangle){0,0,tubes[i].tubeDown.rec.width,tubes[i].tubeDown.rec.height}, (Vector2){tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y}, RAYWHITE);
                     i++;
                 }
                 i=0;
@@ -308,13 +364,16 @@ int main(void){
             case GAME:
             {
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
 
                 DrawRectangleRec(player.rec, player.cor);
+                DrawTextureRec(TaylorTx, (Rectangle){0,0,player.rec.width,player.rec.height}, (Vector2){player.rec.x, player.rec.y}, RAYWHITE);
                 int i =0;
                 while(i<N_BARRA){
-                    DrawRectangle(tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y, tubes[i].tubeUp.rec.width, tubes[i].tubeUp.rec.height, tubes[i].tubeUp.cor);
-                    DrawRectangle(tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y, tubes[i].tubeDown.rec.width, tubes[i].tubeDown.rec.height, tubes[i].tubeDown.cor);
+
+                    DrawTextureRec(UpBarTx, (Rectangle){0,0,tubes[i].tubeUp.rec.width,tubes[i].tubeUp.rec.height}, (Vector2){tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y}, RAYWHITE);
+
+                    DrawTextureRec(DownBarTx, (Rectangle){0,0,tubes[i].tubeDown.rec.width,tubes[i].tubeDown.rec.height}, (Vector2){tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y}, RAYWHITE);
                     i++;
                 }
                 i=0;
@@ -325,143 +384,75 @@ int main(void){
             case OVER:
             {
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
 
-                DrawRectangleRec(player.rec, player.cor);
+                DrawTextureRec(TaylorTx, (Rectangle){0,0,player.rec.width,player.rec.height}, (Vector2){player.rec.x, player.rec.y}, RAYWHITE);
 
                 int i =0;
                 while(i<N_BARRA){
-                    DrawRectangle(tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y, tubes[i].tubeUp.rec.width, tubes[i].tubeUp.rec.height, tubes[i].tubeUp.cor);
-                    DrawRectangle(tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y, tubes[i].tubeDown.rec.width, tubes[i].tubeDown.rec.height, tubes[i].tubeDown.cor);
+                    DrawTextureRec(UpBarTx, (Rectangle){0,0,tubes[i].tubeUp.rec.width,tubes[i].tubeUp.rec.height}, (Vector2){tubes[i].tubeUp.rec.x, tubes[i].tubeUp.rec.y}, RAYWHITE);
+
+                    DrawTextureRec(DownBarTx, (Rectangle){0,0,tubes[i].tubeDown.rec.width,tubes[i].tubeDown.rec.height}, (Vector2){tubes[i].tubeDown.rec.x, tubes[i].tubeDown.rec.y}, RAYWHITE);
                     i++;
                 }
                 i=0;
                 DrawText(string_score, screenWidth - 70, 20, 30, BLUE);
 
                 ClearBackground(RAYWHITE);
-                DrawRectangle(screenWidth/2.0f - 200, screenHeight/2.0f - 100, 400, 200, BLUE);
-                DrawRectangleRec(restartBtn, RED);
-                DrawRectangleRec(menuBtn, RED);
-                DrawText("GAME OVER", screenWidth/2.0f - 123, screenHeight/2.0f - 80, 40, DARKBLUE);
+                DrawTextureRec(GameOverTx, (Rectangle){0,0,400, 200}, (Vector2){screenWidth/2.0f - 200,screenHeight/2.0f - 100}, RAYWHITE);
+                DrawTextureRec(RestartEGTx, (Rectangle){0,0,restartBtn.width,restartBtn.height}, (Vector2){restartBtn.x, restartBtn.y}, RAYWHITE);
+                DrawTextureRec(MenuEGTx, (Rectangle){0,0,menuBtn.width,menuBtn.height}, (Vector2){menuBtn.x, menuBtn.y}, RAYWHITE);
             }break;
             case DIFF:
             {
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
-                DrawRectangleRec(backDiff, RED);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
+                DrawTextureRec(VoltarTx, (Rectangle){0,0,backDiff.width,backDiff.height}, (Vector2){backDiff.x, backDiff.y}, RAYWHITE);
                 DrawRectangle(screenWidth/2 - 250, 50, 500, 100 , RED);
-                DrawRectangleRec(btn1Diff,RED);
-                DrawRectangleRec(btn2Diff,RED);
-                DrawRectangleRec(btn3Diff,RED);
-                DrawRectangleRec(btn4Diff,RED);
-                DrawRectangleRec(btn5Diff,RED);
+                DrawTextureRec(DiffTitleTx, (Rectangle){0,0,500, 100}, (Vector2){screenWidth/2.0f - 250,50}, RAYWHITE);
+                DrawTextureRec(Diff1Tx, (Rectangle){0,0,btn1Diff.width,btn1Diff.height}, (Vector2){btn1Diff.x, btn1Diff.y}, RAYWHITE);
+                DrawTextureRec(Diff2Tx, (Rectangle){0,0,btn2Diff.width,btn2Diff.height}, (Vector2){btn2Diff.x, btn2Diff.y}, RAYWHITE);
+                DrawTextureRec(Diff3Tx, (Rectangle){0,0,btn3Diff.width,btn3Diff.height}, (Vector2){btn3Diff.x, btn3Diff.y}, RAYWHITE);
+                DrawTextureRec(Diff4Tx, (Rectangle){0,0,btn4Diff.width,btn4Diff.height}, (Vector2){btn4Diff.x, btn4Diff.y}, RAYWHITE);
+                DrawTextureRec(Diff5Tx, (Rectangle){0,0,btn1Diff.width,btn5Diff.height}, (Vector2){btn5Diff.x, btn5Diff.y}, RAYWHITE);
 
             }break;
             case RANK:
             {
                 ClearBackground(RAYWHITE);
-                DrawRectangleRec(backMenu, GREEN);
-                DrawRectangleRec(backRank, RED);
-                DrawRectangle(screenWidth/2 - 250, 50, 500, 100 , RED);
-                DrawRectangle(screenWidth/2 - 400, screenHeight/2 - 180 , 810, 80, RED);
-                DrawRectangle(screenWidth/2 - 395, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 350, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 305, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 260, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 215, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 170, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 125, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 80, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 35, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 10, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 55, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 100, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 145, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 190, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 235, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 280, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 325, screenHeight/2 - 175 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 370, screenHeight/2 - 175 , 35, 70, BLUE);
+                DrawTextureRec(FundoTx, (Rectangle){0,0,1200,800}, (Vector2){0,0}, RAYWHITE);
+                DrawTextureRec(VoltarTx, (Rectangle){0,0,backRank.width,backRank.height}, (Vector2){backRank.x, backRank.y}, RAYWHITE);
+                DrawTextureRec(RankTitleTx, (Rectangle){0,0,500, 100}, (Vector2){screenWidth/2.0f - 250,50}, RAYWHITE);
 
-                DrawRectangle(screenWidth/2 - 400, screenHeight/2 - 90 , 810, 80, RED);
-                DrawRectangle(screenWidth/2 - 395, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 350, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 305, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 260, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 215, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 170, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 125, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 80, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 35, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 10, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 55, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 100, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 145, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 190, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 235, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 280, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 325, screenHeight/2 - 85 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 370, screenHeight/2 - 85 , 35, 70, BLUE);
 
-                DrawRectangle(screenWidth/2 - 400, screenHeight/2 , 810, 80, RED);
-                DrawRectangle(screenWidth/2 - 395, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 350, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 305, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 260, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 215, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 170, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 125, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 80, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 35, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 10, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 55, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 100, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 145, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 190, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 235, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 280, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 325, screenHeight/2 + 5 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 370, screenHeight/2 + 5 , 35, 70, BLUE);
+                DrawTextureRec(Base_Rank, (Rectangle){0,0,1000, 80}, (Vector2){screenWidth/2 - 500,screenHeight/2 - 180}, RAYWHITE);
+                DrawText("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", screenWidth/2 - 490, screenHeight/2 - 170, 30, BLUE);
+                DrawText("SCORE:", screenWidth/2 - 490, screenHeight/2 - 135, 30, BLUE);
+                DrawText("1", screenWidth/2 - 370, screenHeight/2 - 135, 30, BLUE);
 
-                DrawRectangle(screenWidth/2 - 400, screenHeight/2 + 90 , 810, 80, RED);
-                DrawRectangle(screenWidth/2 - 395, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 350, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 305, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 260, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 215, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 170, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 125, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 80, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 35, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 10, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 55, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 100, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 145, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 190, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 235, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 280, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 325, screenHeight/2 + 95 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 370, screenHeight/2 + 95 , 35, 70, BLUE);
 
-                DrawRectangle(screenWidth/2 - 400, screenHeight/2 + 180 , 810, 80, RED);
-                DrawRectangle(screenWidth/2 - 395, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 350, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 305, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 260, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 215, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 170, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 125, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 80, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 - 35, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 10, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 55, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 100, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 145, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 190, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 235, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 280, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 325, screenHeight/2 + 185 , 35, 70, BLUE);
-                DrawRectangle(screenWidth/2 + 370, screenHeight/2 + 185 , 35, 70, BLUE);
+                DrawTextureRec(Base_Rank, (Rectangle){0,0,1000, 80}, (Vector2){screenWidth/2 - 500,screenHeight/2 - 90}, RAYWHITE);
+                DrawText("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", screenWidth/2 - 490, screenHeight/2 - 80, 30, BLUE);
+                DrawText("SCORE:", screenWidth/2 - 490, screenHeight/2 - 45, 30, BLUE);
+                DrawText("100", screenWidth/2 - 370, screenHeight/2 - 45, 30, BLUE);
+
+
+                DrawTextureRec(Base_Rank, (Rectangle){0,0,1000, 80}, (Vector2){screenWidth/2 - 500,screenHeight/2}, RAYWHITE);
+                DrawText("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", screenWidth/2 - 490, screenHeight/2 + 10, 30, BLUE);
+                DrawText("SCORE:", screenWidth/2 - 490, screenHeight/2 + 45, 30, BLUE);
+                DrawText("10000", screenWidth/2 - 370, screenHeight/2 + 45, 30, BLUE);
+
+
+                DrawTextureRec(Base_Rank, (Rectangle){0,0,1000, 80}, (Vector2){screenWidth/2 - 500,screenHeight/2 + 90}, RAYWHITE);
+                DrawText("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", screenWidth/2 - 490, screenHeight/2 + 100, 30, BLUE);
+                DrawText("SCORE:", screenWidth/2 - 490, screenHeight/2 + 135, 30, BLUE);
+                DrawText("1000000", screenWidth/2 - 370, screenHeight/2 + 135, 30, BLUE);
+
+
+                DrawTextureRec(Base_Rank, (Rectangle){0,0,1000, 80}, (Vector2){screenWidth/2 - 500,screenHeight/2 + 180}, RAYWHITE);
+                DrawText("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", screenWidth/2 - 490, screenHeight/2 + 190, 30, BLUE);
+                DrawText("SCORE:", screenWidth/2 - 490, screenHeight/2 + 225, 30, BLUE);
+                DrawText("100000000", screenWidth/2 - 370, screenHeight/2 + 225, 30, BLUE);
 
 
             }break;
