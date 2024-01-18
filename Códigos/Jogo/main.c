@@ -544,7 +544,7 @@ int main(void){
                                 powerUp.posit = teste;
                                 powerUp.radius = 40;
                                 pup_spwn == 1;
-                                powerUp.type = 3;//GetRandomValue(1,3);
+                                powerUp.type = GetRandomValue(1,3);
                             }
                         }
                         powerUp.posit.x -= tubeSpeed;
