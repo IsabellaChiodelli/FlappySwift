@@ -171,8 +171,16 @@ int main(void){
     InitWindow(screenWidth, screenHeight, "Teste Joguinho");
 
     // Imagens
+    Image FundoFolkloreTxt = LoadImage("resources/FundoFolklore.png");
+    ImageResize(&FundoFolkloreTxt, 1200, 800);
     Image FundoLoverTxt = LoadImage("resources/FundoLover.png");
+    ImageResize(&FundoLoverTxt, 1200, 800);
     Image Fundo1989Txt = LoadImage("resources/Fundo1989.png");
+    ImageResize(&Fundo1989Txt, 1200, 800);
+    Image FundoReputationTxt = LoadImage("resources/FundoReputation.png");
+    ImageResize(&FundoReputationTxt, 1200, 800);
+
+
 
     // Texturas
     Texture2D Name_Game = LoadTexture("resources/nome_jogo.png");
@@ -189,11 +197,11 @@ int main(void){
     Texture2D MenuEGTx = LoadTexture("resources/Menu_EG.png");
     Texture2D VoltarTx = LoadTexture("resources/Voltar.png");
     Texture2D FundoTx = LoadTexture("resources/Fundo.png");
-    Texture2D FundoFolkloreTx = LoadTexture("resources/Folklore_Background.png");
-    Texture2D Fundo1989Tx = LoadTexture("resources/Fundo1989.png");
+    Texture2D FundoFolkloreTx = LoadTextureFromImage(FundoFolkloreTxt);
+    Texture2D Fundo1989Tx = LoadTextureFromImage(Fundo1989Txt);
     Texture2D FundoLoverTx = LoadTextureFromImage(FundoLoverTxt);
     Texture2D FundoFearlessTx = LoadTexture("resources/FundoFearless.png");
-    Texture2D FundoReputationTx = LoadTexture("resources/FundoRep.png");
+    Texture2D FundoReputationTx = LoadTextureFromImage(FundoReputationTxt);
     Texture2D GameOverTx = LoadTexture("resources/Game_Over.png");
     Texture2D DiffTitleTx = LoadTexture("resources/Diff_titles.png");
     Texture2D RankTitleTx = LoadTexture("resources/Rank_Title.png");
