@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1704319150 source:c:\raylib\jogo\main.c
+	<raylib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1705951841 source:c:\raylib\flappyswift-main\códigos\jogo\main.c
+	<raylib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1705412657 source:c:\users\aluno\desktop\flappyswift-main\flappyswift-main\códigos\jogo\main.c
+	<raylib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1705528516 source:c:\raylib\flappyswift-main\flappyswift-main\códigos\jogo\main.c
+	<raylib.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
